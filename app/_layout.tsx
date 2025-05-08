@@ -1,6 +1,9 @@
+import awsconfig from "@/lib/aws-exports";
+import { Amplify } from 'aws-amplify';
 import { Stack } from "expo-router";
 import './globals.css';
 
+Amplify.configure(awsconfig);
 
 export default function RootLayout() {
   return <Stack>

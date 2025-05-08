@@ -2,21 +2,44 @@ import CustomButton from '@/components/CustomButton';
 import InputField from '@/components/InputField';
 import OAuth from '@/components/OAuth';
 import { icons, images } from "@/constants";
-import { Link } from 'expo-router';
+import { signUp } from 'aws-amplify/auth';
+import { Link, useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { Image, ScrollView, Text, View } from 'react-native';
 
 const SignUp = () => {
-
-
+  const router = useRouter();
   const [form, setForm] = useState({
     name: "",
     email: "",
     password: "",
   });
- 
-  const onSignUpPress = async () => { };
- 
+
+  const onSignUpPress = async () => {
+    try {
+      const result = await signUp({
+        username: form.email,
+        password: form.password,
+        options: {
+          userAttributes: {
+            email: form.email,
+            name: form.name,
+          },
+        },
+      });
+      console.log("Sign-up success:", result);
+      alert("Verification email sent. Please confirm your account.");
+       router.push({
+        pathname:'./confirm-signup',
+        params:{email:form.email}});
+        
+      // Optionally navigate to a confirmation screen
+    } catch (error: any) {
+      console.log("Error signing up:", error);
+      alert(error.message || "Sign-up failed");
+    }
+  };
+
   return (
     <ScrollView className="flex-1 bg-white">
       <View className="flex-1 bg-white">
@@ -27,8 +50,6 @@ const SignUp = () => {
           </Text>
         </View>
         <View className="p-5">
-          
-          
           <InputField
             label="Name"
             placeholder="Enter name"
@@ -58,8 +79,7 @@ const SignUp = () => {
             onPress={onSignUpPress}
             className="mt-6"
           />
-          <OAuth/>
-
+          <OAuth />
           <Link
             href="/sign-in"
             className="text-lg text-center text-general-200 mt-10"
@@ -68,10 +88,9 @@ const SignUp = () => {
             <Text className="text-primary-500">Log In</Text>
           </Link>
         </View>
-        
-        
       </View>
     </ScrollView>
   );
 };
+
 export default SignUp;

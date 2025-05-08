@@ -1,0 +1,20 @@
+{
+  "staging": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-riddoff-staging-bf48f-authRole",
+      "UnauthRoleArn": "arn:aws:iam::909788360139:role/amplify-riddoff-staging-bf48f-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::909788360139:role/amplify-riddoff-staging-bf48f-authRole",
+      "Region": "eu-north-1",
+      "DeploymentBucketName": "amplify-riddoff-staging-bf48f-deployment",
+      "UnauthRoleName": "amplify-riddoff-staging-bf48f-unauthRole",
+      "StackName": "amplify-riddoff-staging-bf48f",
+      "StackId": "arn:aws:cloudformation:eu-north-1:909788360139:stack/amplify-riddoff-staging-bf48f/19d02860-2c0b-11f0-a399-06b54d044e2b",
+      "AmplifyAppId": "dgxk8p4jniudw"
+    },
+    "categories": {
+      "auth": {
+        "riddoff": {}
+      }
+    }
+  }
+}
