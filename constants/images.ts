@@ -1,4 +1,5 @@
 import bg from "@/assets/images/bg.png";
+import check from "@/assets/images/check.png";
 import coverimage from "@/assets/images/coverimage.png";
 import onb1 from "@/assets/images/onb1.png";
 import onb2 from "@/assets/images/onb2.png";
@@ -18,5 +19,6 @@ export const images = {
   onb2,
   onb3,
   coverimage,
+  check,
 };
 

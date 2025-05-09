@@ -18,7 +18,7 @@ export default function TabIcon({
 
 let iconName: React.ComponentProps<typeof Ionicons>['name'];
 switch (name) {
-  case 'index':
+  case 'home':
     iconName = focused ? 'home' : 'home-outline';
     break;
   case 'search':

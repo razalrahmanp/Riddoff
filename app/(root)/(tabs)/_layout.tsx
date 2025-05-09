@@ -20,10 +20,10 @@ export default function TabLayout() {
     >
       {/* Home tab */}
       <Tabs.Screen
-        name="index" 
+        name="home" 
         options={{
           tabBarIcon: ({ focused, color }) => (
-            <TabIcon name="index" focused={focused} color={color} />
+            <TabIcon name="home" focused={focused} color={color} />
           ),
         }}
       />

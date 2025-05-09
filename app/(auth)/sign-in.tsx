@@ -1,53 +1,98 @@
-import CustomButton from '@/components/CustomButton';
-import InputField from '@/components/InputField';
-import OAuth from '@/components/OAuth';
-import { icons, images } from "@/constants";
-import { signIn } from 'aws-amplify/auth';
-import { Link, router } from 'expo-router';
-import React, { useState } from 'react';
-import { Alert, Image, ScrollView, Text, View } from 'react-native';
+// app/(auth)/sign-in.tsx
+import { useSignIn } from "@clerk/clerk-expo";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import React, { useEffect, useState } from "react";
+import { Alert, Image, ScrollView, Text, View } from "react-native";
+import { ReactNativeModal } from "react-native-modal";
 
-const SignIn = () => {
-  const [form, setForm] = useState({
-    email: "",
-    password: "",
-  });
+import CustomButton from "@/components/CustomButton";
+import InputField from "@/components/InputField";
+import OAuth from "@/components/OAuth";
+import { icons, images } from "@/constants";
+
+export default function SignIn() {
+  const { signIn, isLoaded, setActive } = useSignIn();
+  const router = useRouter();
+  const { email: prefillEmail } = useLocalSearchParams<{ email: string }>();
+
+  const [form, setForm] = useState({ email: "", password: "" });
+  const [errorState, setErrorState] = useState<{
+    message: string;
+    visible: boolean;
+  }>({ message: "", visible: false });
+
+  // Prefill email if coming from sign-up flow
+  useEffect(() => {
+    if (prefillEmail) {
+      setForm((f) => ({ ...f, email: prefillEmail }));
+    }
+  }, [prefillEmail]);
 
   const onSignInPress = async () => {
+    if (!isLoaded) return;
+    const email = form.email.trim().toLowerCase();
+    const password = form.password.trim();
+    if (!email || !password) {
+      return Alert.alert(
+        "Missing Fields",
+        "Please enter both your email and password."
+      );
+    }
+
     try {
-      const response = await signIn({
-        username: form.email,
-        password: form.password,
+      // 1) Attempt sign-in
+      const attempt = await signIn.create({
+        identifier: email,
+        password,
       });
 
-      console.log("Sign-in success:", response);
-      // ✅ Redirect to home page
-      router.push("/(root)/(tabs)");
-    } catch (error: any) {
-      console.log("Error Code:", error.code); // If available
-      console.log("Error Message:", error.message);
-      console.log("Error Name:", error.name);
-      Alert.alert("Error", error.message || "Failed to sign in");
+      // 2) If complete, set the session and redirect
+      if (attempt.status === "complete") {
+        await setActive({session:attempt.createdSessionId!});
+        router.replace("/(root)/(tabs)/home");
+      } else {
+        // e.g. MFA or other flows not enabled in your setup
+        setErrorState({
+          message: "Unexpected sign-in status. Please try again.",
+          visible: true,
+        });
+      }
+    } catch (err: any) {
+      console.error("Sign-in error:", err);
+      // Show Clerk’s first error message, or fallback
+      const msg =
+        err.errors?.[0]?.longMessage ||
+        err.message ||
+        "Sign-in failed. Please try again.";
+      setErrorState({ message: msg, visible: true });
     }
   };
 
   return (
     <ScrollView className="flex-1 bg-white">
       <View className="flex-1 bg-white">
+        {/* Header */}
         <View className="relative w-full h-[250px]">
-          <Image source={images.coverimage} className="z-0 w-full h-[250px]" />
+          <Image
+            source={images.coverimage}
+            className="z-0 w-full h-[250px]"
+            resizeMode="cover"
+          />
           <Text className="text-2xl text-white font-JakartaSemiBold absolute bottom-5 left-5">
-            Welcome
+            Welcome Back
           </Text>
         </View>
+
+        {/* Form */}
         <View className="p-5">
           <InputField
             label="Email"
             placeholder="Enter email"
             icon={icons.email}
             textContentType="emailAddress"
+            autoCapitalize="none"
             value={form.email}
-            onChangeText={(value) => setForm({ ...form, email: value })}
+            onChangeText={(v) => setForm((f) => ({ ...f, email: v }))}
           />
           <InputField
             label="Password"
@@ -56,26 +101,53 @@ const SignIn = () => {
             secureTextEntry
             textContentType="password"
             value={form.password}
-            onChangeText={(value) => setForm({ ...form, password: value })}
+            onChangeText={(v) => setForm((f) => ({ ...f, password: v }))}
           />
+
           <CustomButton
             title="Sign In"
             onPress={onSignInPress}
             className="mt-6"
           />
+
           <OAuth />
 
-          <Link
-            href="/sign-up"
-            className="text-lg text-center text-general-200 mt-10"
+          <Text
+            onPress={() => router.push("/(auth)/forgot-password")}
+            className="text-center text-sm text-gray-500 mt-4"
           >
-            Don&apos;t have an account?{" "}
-            <Text className="text-primary-500">Sign Up</Text>
-          </Link>
+            Forgot your password?
+          </Text>
+
+          <Text className="text-lg text-center text-general-200 mt-10">
+            Don’t have an account?{" "}
+            <Text
+              className="text-primary-500"
+              onPress={() => router.replace("/(auth)/sign-up")}
+            >
+              Sign Up
+            </Text>
+          </Text>
         </View>
       </View>
+
+      {/* Error Modal */}
+      <ReactNativeModal
+        isVisible={errorState.visible}
+        onBackdropPress={() => setErrorState({ ...errorState, visible: false })}
+      >
+        <View className="bg-white px-7 py-9 rounded-2xl min-h-[200px]">
+          <Text className="text-xl font-JakartaBold mb-2">Sign-In Failed</Text>
+          <Text className="text-base text-gray-600 mb-4">
+            {errorState.message}
+          </Text>
+          <CustomButton
+            title="OK"
+            onPress={() => setErrorState({ ...errorState, visible: false })}
+            className="bg-primary-500"
+          />
+        </View>
+      </ReactNativeModal>
     </ScrollView>
   );
-};
-
-export default SignIn;
+}
