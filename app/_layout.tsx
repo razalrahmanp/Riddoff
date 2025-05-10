@@ -58,6 +58,18 @@ export default function RootLayout() {
           headerShown: false,
         }}
       />
+      <Stack.Screen
+        name="messages"
+        options={{
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
+        name="activity"
+        options={{
+          headerShown: false,
+        }}
+      />
     </Stack>
     </AuthGate>
     </ClerkProvider>

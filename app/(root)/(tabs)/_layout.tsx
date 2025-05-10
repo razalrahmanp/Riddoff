@@ -22,45 +22,45 @@ export default function TabLayout() {
       <Tabs.Screen
         name="home" 
         options={{
-          tabBarIcon: ({ focused, color }) => (
+          tabBarIcon: ({ focused, color }) => 
             <TabIcon name="home" focused={focused} color={color} />
-          ),
+          ,
         }}
       />
       {/* Search tab */}
       <Tabs.Screen
         name="search"
         options={{
-          tabBarIcon: ({ focused, color }) => (
+          tabBarIcon: ({ focused, color }) => 
             <TabIcon name="search" focused={focused} color={color} />
-          ),
+          ,
         }}
       />
       {/* New Post (Add) tab */}
       <Tabs.Screen
         name="CreatePost"
         options={{
-          tabBarIcon: ({ focused, color }) => (
+          tabBarIcon: ({ focused, color }) => 
             <TabIcon name="CreatePost" focused={focused} color={color} />
-          ),
+          ,
         }}
       />
       {/* Activity (Heart) tab */}
       <Tabs.Screen
         name="saved"
         options={{
-          tabBarIcon: ({ focused, color }) => (
+          tabBarIcon: ({ focused, color }) => 
             <TabIcon name="saved" focused={focused} color={color} />
-          ),
+          ,
         }}
       />
       {/* Profile tab */}
       <Tabs.Screen
         name="profile"
         options={{
-          tabBarIcon: ({ focused, color }) => (
+          tabBarIcon: ({ focused, color }) => 
             <TabIcon name="profile" focused={focused} color={color} />
-          ),
+          ,
         }}
       />
     </Tabs>

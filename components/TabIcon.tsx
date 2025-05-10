@@ -56,6 +56,7 @@ switch (name) {
   }
 
   // For regular icons, simulate "bold effect" by enlarging on focus
+  // console.log(name, focused, color); // Debugging line to see values
   return (
     <Ionicons
       name={iconName}

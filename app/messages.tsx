@@ -1,12 +1,12 @@
 import React from 'react'
 import { Text, View } from 'react-native'
 
-const JoinButton = () => {
+const messages = () => {
   return (
     <View>
-      <Text>JoinButton</Text>
+      <Text>messages</Text>
     </View>
   )
 }
 
-export default JoinButton
+export default messages

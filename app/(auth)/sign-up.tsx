@@ -1,3 +1,4 @@
+// app/(auth)/sign-up.tsx
 import { useSignUp } from "@clerk/clerk-expo";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
@@ -8,6 +9,8 @@ import CustomButton from "@/components/CustomButton";
 import InputField from "@/components/InputField";
 import OAuth from "@/components/OAuth";
 import { icons, images } from "@/constants";
+import { fetchAPI } from "@/lib/fetch";
+// import { fetchAPI } from "@/lib/fetch";
 
 export default function SignUp() {
   const { isLoaded, signUp, setActive } = useSignUp();
@@ -18,7 +21,6 @@ export default function SignUp() {
     email: "",
     password: "",
   });
-
   const [verification, setVerification] = useState({
     state: "default" as "default" | "pending" | "success" | "failed",
     code: "",
@@ -27,17 +29,14 @@ export default function SignUp() {
 
   const onSignUpPress = async () => {
     if (!isLoaded) return;
-
     try {
+      // 1) Create user
       await signUp.create({
         emailAddress: form.email.trim().toLowerCase(),
         password: form.password,
       });
-
-      await signUp.prepareEmailAddressVerification({
-        strategy: "email_code",
-      });
-
+      // 2) Send verification code
+      await signUp.prepareEmailAddressVerification({ strategy: "email_code" });
       setVerification((v) => ({ ...v, state: "pending", error: "" }));
     } catch (err: any) {
       console.error(err);
@@ -47,13 +46,21 @@ export default function SignUp() {
 
   const onVerifyPress = async () => {
     if (!isLoaded) return;
-
     try {
       const attempt = await signUp.attemptEmailAddressVerification({
         code: verification.code.trim(),
       });
-
       if (attempt.status === "complete") {
+        // Optionally send user data to your backend
+        await fetchAPI("/(api)/user", {
+          method: "POST",
+          body: JSON.stringify({
+            name: form.name,
+            email: form.email,
+            clerkId: attempt.createdUserId,
+          }),
+        });
+        // Activate session & redirect
         await setActive({ session: attempt.createdSessionId! });
         setVerification((v) => ({ ...v, state: "success" }));
       } else {
@@ -115,7 +122,11 @@ export default function SignUp() {
             onChangeText={(v) => setForm((f) => ({ ...f, password: v }))}
           />
 
-          <CustomButton title="Sign Up" onPress={onSignUpPress} className="mt-6" />
+          <CustomButton
+            title="Sign Up"
+            onPress={onSignUpPress}
+            className="mt-6"
+          />
 
           <OAuth />
 
@@ -133,7 +144,9 @@ export default function SignUp() {
         {/* Verification Modal */}
         <ReactNativeModal isVisible={verification.state === "pending"}>
           <View className="bg-white px-7 py-9 rounded-2xl min-h-[300px]">
-            <Text className="font-JakartaExtraBold text-2xl mb-2">Verification</Text>
+            <Text className="font-JakartaExtraBold text-2xl mb-2">
+              Verification
+            </Text>
             <Text className="font-Jakarta mb-5">
               We&apos;ve sent a verification code to {form.email}.
             </Text>
@@ -148,7 +161,9 @@ export default function SignUp() {
               }
             />
             {verification.error ? (
-              <Text className="text-red-500 text-sm mt-1">{verification.error}</Text>
+              <Text className="text-red-500 text-sm mt-1">
+                {verification.error}
+              </Text>
             ) : null}
             <CustomButton
               title="Verify Email"
@@ -165,7 +180,9 @@ export default function SignUp() {
               source={images.check}
               className="w-[110px] h-[110px] mx-auto my-5"
             />
-            <Text className="text-3xl font-JakartaBold text-center">Verified</Text>
+            <Text className="text-3xl font-JakartaBold text-center">
+              Verified
+            </Text>
             <Text className="text-base text-gray-400 font-Jakarta text-center mt-2">
               Your account is now active.
             </Text>

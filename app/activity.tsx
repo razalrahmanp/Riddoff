@@ -1,12 +1,12 @@
 import React from 'react'
 import { Text, View } from 'react-native'
 
-const EventCard = () => {
+const activity = () => {
   return (
     <View>
-      <Text>EventCard</Text>
+      <Text>activity</Text>
     </View>
   )
 }
 
-export default EventCard
+export default activity
